@@ -25,7 +25,7 @@ jobs:
             cd build
             CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 cmake -G "Ninja" .. 
       - name: Build
-        run: cd build; cmake --build . --config Release --target RavEngine
+        run: cd build; cmake --build . --config Release --target install
 
   build-linux-gcc:
     name: Linux x64-gcc Compile Check
@@ -49,7 +49,7 @@ jobs:
       - name: Build
         run: | 
               cd build
-              cmake --build . --config Release --target RavEngine
+              cmake --build . --config Release --target install
       
   build-emscripten:
     if: ${{ false }}  # disable for now, since emscripten is not possible without WebGPU
@@ -67,7 +67,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -DCMAKE_TOOLCHAIN_FILE=../emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake .. 
       - name: Build
-        run: cd build; cmake --build . --config Release --target RavEngine --parallel
+        run: cd build; cmake --build . --config Release --target install --parallel
 
   build-mac:
     name: macOS Compile Check
@@ -80,7 +80,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -G "Xcode" ..
       - name: Build
-        run: cd build; cmake --build . --config Release --target RavEngine
+        run: cd build; cmake --build . --config Release --target install
  
   build-ios:
     name: iOS Compile Check
@@ -93,7 +93,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -G "Xcode" -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/toolchains/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=OFF -DDEPLOYMENT_TARGET=14.0 .. 
       - name: Build
-        run: cd build; cmake --build . --config Release --target RavEngine
+        run: cd build; cmake --build . --config Release --target install
         
   build-tvos:
     name: tvOS Compile Check
@@ -106,7 +106,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -G "Xcode" -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/toolchains/ios.toolchain.cmake -DPLATFORM=TVOSCOMBINED -DENABLE_ARC=OFF -DDEPLOYMENT_TARGET=14.0 ..
       - name: Build
-        run: cd build; cmake --build . --config Release --target RavEngine
+        run: cd build; cmake --build . --config Release --target install
                 
   build-windows:
     name: Windows x64 Compile Check
@@ -119,7 +119,7 @@ jobs:
       - name: Configure
         run: mkdir build && cd build; cmake -Wno-dev -DRAVENGINE_BUILD_TESTS=ON .. ; cmake ..
       - name: Build
-        run: cd build; cmake --build . --config release --target RavEngine
+        run: cd build; cmake --build . --config release --target install
   
   build-windows-arm:
       name: Windows ARM64 Compile Check
@@ -132,7 +132,7 @@ jobs:
         - name: Configure
           run: mkdir build && cd build; cmake -Wno-dev -DRAVENGINE_BUILD_TESTS=ON -AARM64 .. ; cmake ..
         - name: Build
-          run: cd build; cmake --build . --config release --target RavEngine
+          run: cd build; cmake --build . --config release --target install
 
   build-UWP:
     name: UWP Compile Check
@@ -145,7 +145,7 @@ jobs:
       - name: Configure
         run: mkdir build && cd build; cmake -Ax64 -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0" .. ; cmake .. ; 
       - name: Build
-        run: cd build; cmake --build . --config release --target RavEngine
+        run: cd build; cmake --build . --config release --target install
         
   test-linux:
     name: Linux Unit Tests (g++)
