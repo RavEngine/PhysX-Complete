@@ -29,6 +29,11 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(TARGET_ANDROID ON)
 endif()
 
+# DNDEBUG and DEBUG
+add_compile_definitions(
+	$<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>
+)
+
 # PhysX-specific CMake project setup
 set(NV_USE_DEBUG_WINCRT ON CACHE BOOL "Use the debug version of the CRT")
 set(PHYSX_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/physx CACHE INTERNAL "")

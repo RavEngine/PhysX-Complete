@@ -25,7 +25,7 @@ jobs:
             cd build
             CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 cmake -G "Ninja" .. 
       - name: Build
-        run: cd build; cmake --build . --config Release --target install
+        run: cd build; cmake --build . --config Release --target ALL_BUILD
 
   build-linux-gcc:
     name: Linux x64-gcc Compile Check
@@ -49,7 +49,7 @@ jobs:
       - name: Build
         run: | 
               cd build
-              cmake --build . --config Release --target install
+              cmake --build . --config Release --target ALL_BUILD
       
   build-emscripten:
     if: ${{ false }}  # disable for now, since emscripten is not possible without WebGPU
@@ -67,7 +67,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -DCMAKE_TOOLCHAIN_FILE=../emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake .. 
       - name: Build
-        run: cd build; cmake --build . --config Release --target install --parallel
+        run: cd build; cmake --build . --config Release --target ALL_BUILD --parallel
 
   build-mac:
     name: macOS Compile Check
@@ -80,7 +80,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -G "Xcode" ..
       - name: Build
-        run: cd build; cmake --build . --config Release --target install
+        run: cd build; cmake --build . --config Release --target ALL_BUILD
  
   build-ios:
     name: iOS Compile Check
@@ -93,7 +93,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -G "Xcode" -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/toolchains/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=OFF -DDEPLOYMENT_TARGET=14.0 .. 
       - name: Build
-        run: cd build; cmake --build . --config Release --target install
+        run: cd build; cmake --build . --config Release --target ALL_BUILD
         
   build-tvos:
     name: tvOS Compile Check
@@ -106,7 +106,7 @@ jobs:
       - name: Configure
         run: mkdir -p build && cd build; cmake -G "Xcode" -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/toolchains/ios.toolchain.cmake -DPLATFORM=TVOSCOMBINED -DENABLE_ARC=OFF -DDEPLOYMENT_TARGET=14.0 ..
       - name: Build
-        run: cd build; cmake --build . --config Release --target install
+        run: cd build; cmake --build . --config Release --target ALL_BUILD
                 
   build-windows:
     name: Windows x64 Compile Check
@@ -119,7 +119,7 @@ jobs:
       - name: Configure
         run: mkdir build && cd build; cmake -Wno-dev -DRAVENGINE_BUILD_TESTS=ON .. ; cmake ..
       - name: Build
-        run: cd build; cmake --build . --config release --target install
+        run: cd build; cmake --build . --config release --target ALL_BUILD
   
   build-windows-arm:
       name: Windows ARM64 Compile Check
@@ -132,7 +132,7 @@ jobs:
         - name: Configure
           run: mkdir build && cd build; cmake -Wno-dev -DRAVENGINE_BUILD_TESTS=ON -AARM64 .. ; cmake ..
         - name: Build
-          run: cd build; cmake --build . --config release --target install
+          run: cd build; cmake --build . --config release --target ALL_BUILD
 
   build-UWP:
     name: UWP Compile Check
@@ -145,54 +145,4 @@ jobs:
       - name: Configure
         run: mkdir build && cd build; cmake -Ax64 -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0" .. ; cmake .. ; 
       - name: Build
-        run: cd build; cmake --build . --config release --target install
-        
-  test-linux:
-    name: Linux Unit Tests (g++)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Install Dependencies
-        run: |
-              sudo apt-get update
-              sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-              sudo apt-get update
-              sudo apt-get install cmake g++-11 ninja-build libgl1-mesa-dev libasound2-dev libegl-dev libvulkan-dev libx11-xcb-dev libxcb-dri2-0-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-randr0-dev libxrandr-dev libxxf86vm-dev mesa-common-dev -y --no-install-recommends 
-      - name: Build and Test
-        run: |
-                cd test 
-                CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11 ./test-linux.sh
-      - name: Output test logs
-        if: ${{ failure() }}
-        run: cat build/Testing/Temporary/LastTest.log
-        
-  test-mac:
-    name: macOS Unit Tests
-    runs-on: macos-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Build and Test
-        run: cd test && ./test-mac.sh
-      - name: Output test logs
-        if: ${{ failure() }}
-        run: cat build/Testing/Temporary/LastTest.log
-        
-  test-windows:
-    name: Windows Unit Tests
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Build and Test
-        run: cd test && .\test-win.bat
-      - name: Output test logs
-        if: ${{ failure() }}
-        run: cat build\Testing\Temporary\LastTest.log
+        run: cd build; cmake --build . --config release --target ALL_BUILD
