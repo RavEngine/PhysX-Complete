@@ -42,7 +42,6 @@ namespace ExtGpu
 
 void PxDmaDataToDevice(PxCudaContextManager* cudaContextManager, PxParticleBuffer* particleBuffer, const PxParticleBufferDesc& desc)
 {
-#ifndef PX_OSX
 	cudaContextManager->acquireContext();
 
 	PxVec4* posInvMass = particleBuffer->getPositionInvMasses();
@@ -64,7 +63,6 @@ void PxDmaDataToDevice(PxCudaContextManager* cudaContextManager, PxParticleBuffe
 	cudaContext->streamSynchronize(0);
 
 	cudaContextManager->releaseContext();
-#endif
 }
 
 PxParticleBuffer* PxCreateAndPopulateParticleBuffer(const PxParticleBufferDesc& desc, PxCudaContextManager* cudaContextManager)
@@ -85,7 +83,6 @@ PxParticleAndDiffuseBuffer* PxCreateAndPopulateParticleAndDiffuseBuffer(const Px
 
 PxParticleClothBuffer* PxCreateAndPopulateParticleClothBuffer(const PxParticleBufferDesc& desc, const PxParticleClothDesc& clothDesc, PxPartitionedParticleCloth& output, PxCudaContextManager* cudaContextManager)
 {
-#ifndef PX_OSX
 	cudaContextManager->acquireContext();
 
 	PxParticleClothBuffer* clothBuffer = PxGetPhysics().createParticleClothBuffer(desc.maxParticles, desc.maxVolumes, clothDesc.nbCloths, clothDesc.nbTriangles, clothDesc.nbSprings, cudaContextManager);
@@ -116,13 +113,12 @@ PxParticleClothBuffer* PxCreateAndPopulateParticleClothBuffer(const PxParticleBu
 
 	cudaContextManager->releaseContext();
 
+
 	return clothBuffer;
-#endif
 }
 
 PxParticleRigidBuffer* PxCreateAndPopulateParticleRigidBuffer(const PxParticleBufferDesc& desc, const PxParticleRigidDesc& rigidDesc, PxCudaContextManager* cudaContextManager)
 {
-#ifndef PX_OSX
 	cudaContextManager->acquireContext();
 
 	PxParticleRigidBuffer* rigidBuffer = PxGetPhysics().createParticleRigidBuffer(desc.maxParticles, desc.maxVolumes, rigidDesc.maxRigids, cudaContextManager);
@@ -162,8 +158,7 @@ PxParticleRigidBuffer* PxCreateAndPopulateParticleRigidBuffer(const PxParticleBu
 
 	cudaContextManager->releaseContext();
 
-    return rigidBuffer;
-    #endif
+return rigidBuffer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +171,6 @@ PxParticleAttachmentBuffer::PxParticleAttachmentBuffer(PxParticleBuffer& particl
 
 PxParticleAttachmentBuffer::~PxParticleAttachmentBuffer()
 {
-#ifndef PX_OSX
 	mCudaContextManager->acquireContext();
 
 	PxCudaContext* cudaContext = mCudaContextManager->getCudaContext();
@@ -190,12 +184,10 @@ PxParticleAttachmentBuffer::~PxParticleAttachmentBuffer()
 	mDeviceFilters = NULL;
 
 	mCudaContextManager->releaseContext();
-#endif
 }
 
 void PxParticleAttachmentBuffer::copyToDevice(CUstream stream)
 {
-#ifndef PX_OSX
 	mCudaContextManager->acquireContext();
 
 	PxCudaContext* cudaContext = mCudaContextManager->getCudaContext();
@@ -244,7 +236,6 @@ void PxParticleAttachmentBuffer::copyToDevice(CUstream stream)
 	mDestroyedRefrencedBodies.resize(0);
 
 	mCudaContextManager->releaseContext();
-#endif
 }
 
 void PxParticleAttachmentBuffer::addRigidAttachment(PxRigidActor* rigidActor, const PxU32 particleID, const PxVec3& localPose, PxConeLimitedConstraint* coneLimit)
@@ -434,7 +425,6 @@ struct ParticleClothBuffersImpl : public PxParticleClothBufferHelper, public PxU
 	ParticleClothBuffersImpl(const PxU32 maxCloths, const PxU32 maxTriangles, const PxU32 maxSprings, const PxU32 maxParticles, PxCudaContextManager* cudaContextManager)
 		: mCudaContextManager(cudaContextManager)
 	{
-#ifndef PX_OSX
 		mMaxParticles = maxParticles;
 		mClothDesc.nbParticles = 0;
 		mClothDesc.restPositions = mCudaContextManager->allocPinnedHostBuffer<PxVec4>(maxParticles);
@@ -450,17 +440,14 @@ struct ParticleClothBuffersImpl : public PxParticleClothBufferHelper, public PxU
 		mMaxCloths = maxCloths;
 		mClothDesc.nbCloths = 0;
 		mClothDesc.cloths = mCudaContextManager->allocPinnedHostBuffer<PxParticleCloth>(maxCloths);
-#endif
 	}
 
 	void release()
 	{
-#ifndef PX_OSX
 		mCudaContextManager->freePinnedHostBuffer(mClothDesc.cloths);
 		mCudaContextManager->freePinnedHostBuffer(mClothDesc.restPositions);
 		mCudaContextManager->freePinnedHostBuffer(mClothDesc.triangles);
 		mCudaContextManager->freePinnedHostBuffer(mClothDesc.springs);
-#endif
 		PX_DELETE_THIS;
 	}
 
@@ -568,17 +555,14 @@ struct ParticleVolumeBuffersImpl : public PxParticleVolumeBufferHelper, public P
 		mNumTriangles = 0;
 		mParticleVolumeMeshes = reinterpret_cast<PxParticleVolumeMesh*>(PX_ALLOC(sizeof(PxParticleVolumeMesh) * maxVolumes, "ParticleVolumeBuffersImpl::mParticleVolumeMeshes"));
 		mTriangles = reinterpret_cast<PxU32*>(PX_ALLOC(sizeof(PxU32) * maxTriangles * 3, "ParticleVolumeBuffersImpl::mTriangles"));
-#ifndef PX_OSX
+
 		mParticleVolumes = cudaContextManager->allocPinnedHostBuffer<PxParticleVolume>(maxVolumes);
-#endif
 		mCudaContextManager = cudaContextManager;
 	}
 
 	void release()
 	{
-#ifndef PX_OSX
 		mCudaContextManager->freePinnedHostBuffer(mParticleVolumes);
-#endif
 		PX_FREE(mParticleVolumeMeshes);
 		PX_FREE(mTriangles);
 		PX_DELETE_THIS;
@@ -682,26 +666,23 @@ struct ParticleRigidBuffersImpl : public PxParticleRigidBufferHelper, public PxU
 		mRigidDesc.numActiveRigids = 0;
 		mMaxParticles = maxParticles;
 		mNumParticles = 0;
-#ifndef PX_OSX
+
 		mCudaContextManager->allocPinnedHostBuffer<PxU32>(mRigidDesc.rigidOffsets, maxRigids + 1);
 		mCudaContextManager->allocPinnedHostBuffer<PxReal>(mRigidDesc.rigidCoefficients, maxRigids);
 		mCudaContextManager->allocPinnedHostBuffer<PxVec4>(mRigidDesc.rigidTranslations, maxRigids);
 		mCudaContextManager->allocPinnedHostBuffer<PxQuat>(mRigidDesc.rigidRotations, maxRigids);
 		mCudaContextManager->allocPinnedHostBuffer<PxVec4>(mRigidDesc.rigidLocalPositions, maxParticles);
 		mCudaContextManager->allocPinnedHostBuffer<PxVec4>(mRigidDesc.rigidLocalNormals, maxParticles);
-#endif
 	}
 
 	void release()
 	{
-#ifndef PX_OSX
 		mCudaContextManager->freePinnedHostBuffer(mRigidDesc.rigidOffsets);
 		mCudaContextManager->freePinnedHostBuffer(mRigidDesc.rigidCoefficients);
 		mCudaContextManager->freePinnedHostBuffer(mRigidDesc.rigidTranslations);
 		mCudaContextManager->freePinnedHostBuffer(mRigidDesc.rigidRotations);
 		mCudaContextManager->freePinnedHostBuffer(mRigidDesc.rigidLocalPositions);
 		mCudaContextManager->freePinnedHostBuffer(mRigidDesc.rigidLocalNormals);
-#endif
 		PX_DELETE_THIS;
 	}
 
