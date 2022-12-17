@@ -30,9 +30,7 @@
 #define PX_PREPROCESSOR_H
 
 #include <stddef.h>
-#if !defined(PX_GENERATE_META_DATA)
-#include <ciso646>  
-#endif
+
 /** \addtogroup foundation
   @{
 */
@@ -122,6 +120,12 @@ Architecture defines, see http://sourceforge.net/p/predef/wiki/Architectures/
 	#error "Unknown architecture"
 #endif
 
+#if defined __EMSCRIPTEN__
+#define PX_WASM 1
+#else
+#define PX_WASM 0
+#endif
+
 /**
 SIMD defines
 */
@@ -187,6 +191,12 @@ define anything not defined on this platform to 0
 #endif
 #ifndef PX_VMX
 	#define PX_VMX 0
+#endif
+
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#define PX_UWP 1   
+#else
+#define PX_UWP 0
 #endif
 
 /*

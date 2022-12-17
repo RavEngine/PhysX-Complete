@@ -30,6 +30,7 @@
 #include "foundation/PxErrorCallback.h"
 #include "foundation/PxAtomic.h"
 #include "foundation/PxThread.h"
+#include <thread>
 
 #include <math.h>
 #if !PX_APPLE_FAMILY && !defined(__CYGWIN__) && !PX_EMSCRIPTEN
@@ -91,7 +92,9 @@ static void setTid(ThreadImpl& threadImpl)
 {
 // query TID
 // AM: TODO: neither of the below are implemented
-#if PX_APPLE_FAMILY
+#if PX_PS4 || (defined (TARGET_OS_TV) && TARGET_OS_TV)
+    // do nothing
+#elif PX_APPLE_FAMILY
 	threadImpl.tid = syscall(SYS_gettid);
 #elif PX_EMSCRIPTEN
 	threadImpl.tid = pthread_self();
@@ -269,7 +272,7 @@ void PxThreadImpl::yieldProcessor()
 {
 #if (PX_ARM || PX_A64)
 	__asm__ __volatile__("yield");
-#else
+#elif (PX_X86 || PX_X64) && !PX_WASM
 	__asm__ __volatile__("pause");
 #endif
 }
