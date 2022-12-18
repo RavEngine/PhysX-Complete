@@ -40,10 +40,11 @@ target_link_libraries(your-app PRIVATE
 - Linux
 - iOS 
 - AppleTV 
+- WebAssembly / Emscripten
 
 
 ### Current Version
-- PhysX 5.1 as of Nov 9, 2022
+- PhysX 5.1.2 as of Dec 12, 2022 (No Blast yet)
 
 ### Contributing
 Contributions are welcome. Please submit Issues if you find problems, and Pull Requests to address issues. If the problem is
